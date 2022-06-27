@@ -1,0 +1,209 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>
+      Карта спортивной активности
+    </title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0.6% 0% 0% 0%;
+        margin: 0;
+        height: 98.8%;
+        width: 100%;
+      }
+	  #footDiv {
+		height: 1%;
+        padding: 10px;
+	  }
+      #sidebar {
+        z-index: 99;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 35px;
+        background: rgba(144, 238, 144, 0.5);
+        width: 100%;
+        margin: 0%;
+      }
+
+      #text {
+        color: #04BF9D;
+        padding: 5px;
+        -webkit-text-stroke: 1px black;
+        margin: -19px 0px;
+        font-size: 11pt;
+       }
+    </style>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.23/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.23/"></script>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/layers/FeatureLayer",
+        "esri/views/MapView",
+        "esri/widgets/Legend",
+		
+		"esri/widgets/Expand",
+		
+		"esri/widgets/Home",
+		"esri/widgets/BasemapToggle"
+      ], (Map, FeatureLayer, MapView, Legend, Expand, Home, BasemapToggle) => {
+        
+		
+		const kategRenderer = {
+          type: "unique-value",
+          legendOptions: {
+            title: "Категории"
+          },
+          field: "Катег",
+          uniqueValueInfos: [{
+            value: "Спортивная секция",
+            label: "Спортивная секция",
+            symbol: {
+              type: "simple-marker",
+              color: "#04BF9D",
+              
+            }
+          }, 
+		  {
+            value: "Спортивный объект",
+            label: "Спортивный объект",
+            symbol: {
+              type: "simple-marker",
+              color: "#04BF9D",
+              
+            }
+          }, 
+		  {
+            value: "Физкультурное занятие",
+            label: "Физкультурное занятие",
+            symbol: {
+              type: "simple-marker",
+              color: "#04BF9D",
+              
+            }
+          }, 
+		  ]
+        };
+		
+		
+        
+		
+		const map = new Map({
+          basemap: "osm"
+        });
+
+        // Create the MapView
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [56.23769,58.00086],
+          zoom: 11,
+        });		
+		
+		const homeBtn = new Home({
+          view: view,
+        });
+        view.ui.add(homeBtn, "top-left");
+		
+        const template = {          
+          title: "{Адрес}, {Район}",
+          content: [
+            {             
+              type: "fields",
+              fieldInfos: [                
+				{
+                  fieldName: "Актив",
+                  label: "Активность"
+				  
+                },
+				{
+                  fieldName: "Катег",
+                  label: "Категория"
+				  
+                },
+				{
+                  fieldName: "Конта",
+                  label: "Контактная информация"
+				  
+                },
+				{
+                  fieldName: "Допол",
+                  label: "Дополнительная информация"
+				  
+                },				
+              ]
+            }
+          ]
+        };
+		
+    const toggle = new BasemapToggle({
+          view: view, 
+          nextBasemap: "hybrid" 
+        });
+        view.ui.add(toggle, "top-left");
+
+		const instructionsExpand = new Expand({
+          expandIconClass: "esri-icon-question",
+          expandTooltip: "Информация о веб-сервисе",
+          view: view,
+          expanded: true,
+          content: `
+        <div style='width:330px; height:60px; padding:5px; background-color:white'><b>Автор - Матвей Лунегов</b> <p><b><a style='text-decoration: none' href="https://forms.gle/xxFZ8Tcj4CbX4ZqKA" target="_blank">Форма для добавления активностей на карту</a></b></p></div>
+        `
+        });
+        view.ui.add(instructionsExpand, "top-right");
+		
+		const renderer = {
+          type: "simple",
+          field: "Катег",
+          symbol: {
+            type: "simple-marker",
+            color: "orange",
+            outline: {
+              color: "white"
+            }
+          },
+          visualVariables: [
+            {
+              type: "size",
+              field: "Катег",
+              
+            }
+          ]
+        };
+        const featureLayer = new FeatureLayer({
+          url: "https://services5.arcgis.com/6Ka1GzVVr3OS3dEg/arcgis/rest/services/shp/FeatureServer",
+          popupTemplate: template,
+		  renderer: kategRenderer,
+        });
+        map.add(featureLayer);
+      });
+    </script>
+  </head>
+
+  <body>
+    
+    <div id="viewDiv">
+      <div id="sidebar" class="esri-widget">
+        <div id="text">
+          <h1>Карта спортивных активностей города Перми</h1>
+        </div>
+      </div>
+    </div>
+	<div id="legenfLegendDiv"></div>
+	
+  </body>
+</html>
